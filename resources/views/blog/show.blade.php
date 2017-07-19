@@ -21,8 +21,12 @@
                             <div class="post-meta no-border">
                                 <ul class="post-meta-group">
                                     <li><i class="fa fa-user"></i><a href="{{ route('author', $post->author->slug) }}">{{ $post->author->name }}</a></li>
-                                    <li><i class="fa fa-clock-o"></i><time>{{ $post->date }}</time></li>
-                                    <li><i class="fa fa-tags"></i><a href="#"> Blog</a></li>
+                                    <li><i class="fa fa-clock-o"></i>
+                                        <time>{{ $post->zzz }}</time>
+                                    </li>
+                                    <li><i class="fa fa-folder"></i><a
+                                                href="{{ route('category', $post->category->slug) }}"> {{ $post->category->title }}</a>
+                                    </li>
                                     <li><i class="fa fa-comments"></i><a href="#">4 Comments</a></li>
                                 </ul>
                             </div>
@@ -32,24 +36,26 @@
                         </div>
                     </div>
                 </article>
-
+	            <?php $author = $post->author; ?>
                 <article class="post-author padding-10">
                     <div class="media">
                         <div class="media-left">
-                            <a href="#">
-                                <img alt="Author 1" src="/img/author.jpg" class="media-object">
+                            <a href="{{ route('author', $author->slug) }}">
+                                <img alt="{{ $author->name }}" src="{{ $post->author->gravatar() }}"
+                                     class="media-object">
                             </a>
                         </div>
                         <div class="media-body">
-                            <h4 class="media-heading"><a href="{{ route('author', $post->author->slug) }}">{{ $post->author->name }}</a></h4>
+                            <h4 class="media-heading"><a
+                                        href="{{ route('author', $author->slug) }}">{{ $post->author->name }}</a></h4>
                             <div class="post-author-count">
-                                <a href="{{ route('author', $post->author->slug) }}">
+                                <a href="{{ route('author', $author->slug) }}">
                                     <i class="fa fa-clone"></i>
-                                    <?php $postCount = $post->author->posts->count() ?>
+		                            <?php $postCount = $author->posts()->published()->count() ?>
                                     {{ $postCount }} {{ str_plural('post', $postCount) }}.
                                 </a>
                             </div>
-                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Nobis ad aut sunt cum, mollitia excepturi neque sint magnam minus aliquam, voluptatem, labore quis praesentium eum quae dolorum temporibus consequuntur! Non.</p>
+                            <p>{!! $author->bio_html !!}</p>
                         </div>
                     </div>
                 </article>
