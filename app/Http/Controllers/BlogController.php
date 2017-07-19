@@ -13,37 +13,33 @@ class BlogController extends Controller
 
     public function index()
     {
-    	$categories = Category::with(['posts'=> function($query){
-    		$query->published();
-	    }])->orderBy('title', 'asc')->get(); //только get()! all() не будет работать после сортировки!
 
     	$posts = Post::with('author')
 	                 ->latestFirst()
 	                 ->published()
 	                 ->simplePaginate($this->limit);
 
-    	return view("blog.index", compact('posts', 'categories')); //т.е. в шаблон передаем массивы моделей
+    	return view("blog.index", compact('posts')); //т.е. в шаблон передаем массивы моделей
     }
 
-	public function category($id)
+	public function category(Category $category)
 	{
-		//счетчик статей
-		$categories = Category::with(['posts'=> function($query){
-			$query->published();
-		}])->orderBy('title', 'asc')->get(); //только get()! all() не будет работать после сортировки!
-		//конец счетчика
+		$categoryName = $category->title;
 
-		$posts = Post::with('author')
-		             ->latestFirst()
-		             ->published()
-		             ->where('category_id', $id) //фильтруем по категории
-		             ->simplePaginate($this->limit);
+		$posts = $category->posts()
+		                 ->with('author') //чтобы уменьшить кол-во запросов
+		                 ->latestFirst()
+		                 ->published()
+		                 ->simplePaginate($this->limit);
 
-		return view("blog.index", compact('posts', 'categories')); //т.е. в шаблон передаем массивы моделей
+		return view("blog.index", compact('posts', 'categoryName')); //т.е. в шаблон передаем переменные из того же контроллера
 	}
 
 	public function show(Post $post)
     {
+
+
+	    //в compact передаем переменые в шаблон
     	return view("blog.show", compact('post'));
     }
 }
