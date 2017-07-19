@@ -6,6 +6,7 @@ use App\Category;
 use App\Post;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use App\User;
 
 class BlogController extends Controller
 {
@@ -35,10 +36,20 @@ class BlogController extends Controller
 		return view("blog.index", compact('posts', 'categoryName')); //т.е. в шаблон передаем переменные из того же контроллера
 	}
 
+	public function author(User $author)
+	{
+		$authorName = $author->name;
+
+		$posts = $author->posts()
+		                  ->with('category') //чтобы уменьшить кол-во запросов
+		                  ->latestFirst()
+		                  ->published()
+		                  ->simplePaginate($this->limit);
+
+		return view("blog.index", compact('posts', 'authorName'));	}
+
 	public function show(Post $post)
     {
-
-
 	    //в compact передаем переменые в шаблон
     	return view("blog.show", compact('post'));
     }
