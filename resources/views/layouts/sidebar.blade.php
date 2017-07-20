@@ -29,16 +29,16 @@
 
         <div class="widget">
             <div class="widget-heading">
-                <h4>Popular Posts</h4>
+                <h4>Популярное</h4>
             </div>
             <div class="widget-body">
                 <ul class="popular-posts">
                     @foreach($popularPosts as $post)
                     <li>
-                        @if ($post->image_url)
+                        @if ($post->image_thumb_url)
                         <div class="post-image">
                             <a href="{{ route('blog.show', $post->slug) }}">
-                                <img src="{{ $post->image_url }}"/>
+                                <img src="{{ $post->image_thumb_url }}"/>
                             </a>
                         </div>
                         @endif
