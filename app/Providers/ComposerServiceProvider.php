@@ -2,9 +2,8 @@
 
 namespace App\Providers;
 
-use App\Post;
 use Illuminate\Support\ServiceProvider;
-use App\Category;
+use App\Views\Composers\NavigationComposer; // мое!!! :)
 
 class ComposerServiceProvider extends ServiceProvider {
 	/**
@@ -13,23 +12,7 @@ class ComposerServiceProvider extends ServiceProvider {
 	 * @return void
 	 */
 	public function boot() {
-		view()->composer( 'layouts.sidebar', function ( $view ) {
-			//счетчик опубликованных статей и вывод меню?
-			$categories = Category::with( [
-				'posts' => function ( $query ) {
-					$query->published();
-				}
-			] )->orderBy( 'title', 'asc' )->get(); //только get()! all() не будет работать после сортировки!
-
-			return $view->with( 'categories', $categories ); //под каким именем что передаем
-		} );
-
-		view()->composer( 'layouts.sidebar', function ( $view ) {
-			$popularPosts = Post::published()->popular()->take( 3 )->get();
-
-			//функцию popular определели в модели
-			return $view->with( 'popularPosts', $popularPosts );
-		} );
+		view()->composer( 'layouts.sidebar', NavigationComposer::class );
 	}
 
 	/**

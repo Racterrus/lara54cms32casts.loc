@@ -50,7 +50,10 @@ class BlogController extends Controller
 
 	public function show(Post $post)
     {
-	    //в compact передаем переменые в шаблон
+	    //счетчик просмотров постов, для этого способа не нужно указывать поле fillable в модели
+	    $post->increment( 'view_count' );
+
+	    //в compact передаем переменую-объект? в шаблон
     	return view("blog.show", compact('post'));
     }
 }
