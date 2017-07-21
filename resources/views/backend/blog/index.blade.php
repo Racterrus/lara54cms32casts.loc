@@ -27,11 +27,17 @@
                     <div class="box">
                         <div class="box-header">
                             <div class="pull-left">
-                                <a href="{{ route('backend.blog.create') }}" class="btn btn-success">Добавить новую</a>
+                                <a href="{{ route('backend.blog.create') }}" class="btn btn-success">Add New</a>
                             </div>
                         </div>
                         <!-- /.box-header -->
                         <div class="box-body ">
+                            @if(session('success'))
+                                <div class="alert alert-info">
+                                    {{ session('success') }}
+                                </div>
+                            @endif
+
                             @if (! $posts->count())
                                 <div class="alert alert-danger">
                                     <strong>No record found</strong>
@@ -44,7 +50,7 @@
                                         <td>Title</td>
                                         <td width="120">Author</td>
                                         <td width="150">Category</td>
-                                        <td width="177">Date</td>
+                                        <td width="170">Date</td>
                                     </tr>
                                     </thead>
                                     <tbody>
@@ -65,10 +71,9 @@
                                             <td>{{ $post->author->name }}</td>
                                             <td>{{ $post->category->title }}</td>
                                             <td>
-                                                <abbr title="{{ $post->dateFormatted(true)}}">{{ $post->dateFormatted() }}</abbr>
+                                                <abbr title="{{ $post->dateFormatted(true) }}">{{ $post->dateFormatted() }}</abbr>
                                                 |
                                                 {!! $post->publicationLabel() !!}
-
                                             </td>
                                         </tr>
 

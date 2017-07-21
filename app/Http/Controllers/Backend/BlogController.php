@@ -27,8 +27,8 @@ class BlogController extends BackendController {
 	 *
 	 * @return \Illuminate\Http\Response
 	 */
-	public function create() {
-		dd( 'create new blog post' );
+	public function create( Post $post ) {
+		return view( 'backend.blog.create', compact( 'post' ) );
 	}
 
 	/**
@@ -38,8 +38,13 @@ class BlogController extends BackendController {
 	 *
 	 * @return \Illuminate\Http\Response
 	 */
-	public function store( Request $request ) {
-		//
+	public function store( Requests\PostRequest $request ) {
+		//сначала - валидация!
+
+		$request->user()->posts()->create( $request->all() );
+
+//помин про RETURN!!!
+		return redirect( 'backend/blog/' )->with( 'success', 'Пост создан успешно!' );
 	}
 
 	/**

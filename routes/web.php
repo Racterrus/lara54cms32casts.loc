@@ -37,6 +37,7 @@ Route::resource( '/backend/blog', 'Backend\BlogController', [
 		'index'   => 'backend.blog.index',
 		'edit'    => 'backend.blog.edit',
 		'destroy' => 'backend.blog.destroy',
+		'store'   => 'backend.blog.store'
 	]
 ]);
 
