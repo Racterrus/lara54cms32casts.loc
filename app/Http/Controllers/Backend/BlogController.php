@@ -8,6 +8,12 @@ use App\Post;
 
 class BlogController extends BackendController {
 	protected $limit = 5;
+	protected $uploadPath;
+
+	public function __construct() {
+		parent::__construct();
+		$this->uploadPath = public_path( 'img' );
+	}
 
 	/**
 	 * Display a listing of the resource.
@@ -39,12 +45,33 @@ class BlogController extends BackendController {
 	 * @return \Illuminate\Http\Response
 	 */
 	public function store( Requests\PostRequest $request ) {
-		//сначала - валидация!
+		//сначала - валидация! она спрятана в PostRequest :)
 
-		$request->user()->posts()->create( $request->all() );
+		$data = $this->handleRequest( $request );
+//		$image       = $request->file( 'image' );
+//		$fileName    = $image->getClientOriginalName();
+//		dd($fileName);
+
+		$request->user()->posts()->create( $data );
 
 //помин про RETURN!!!
 		return redirect( 'backend/blog/' )->with( 'success', 'Пост создан успешно!' );
+	}
+
+	private function handleRequest( $request ) {
+		$data = $request->all();
+
+		if ( $request->hasFile( 'image' ) ) {
+			$image       = $request->file( 'image' );
+			$fileName    = $image->getClientOriginalName();
+			$destination = $this->uploadPath;
+
+			$image->move( $destination, $fileName );
+
+			$data['image'] = $fileName;
+		}
+
+		return $data;
 	}
 
 	/**
