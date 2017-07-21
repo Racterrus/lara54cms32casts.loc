@@ -19,19 +19,28 @@ Route::get('/', [
 Route::get('/blog/{post}', [
 	'uses' => 'BlogController@show',
 	'as'   => 'blog.show'
-]);
+] );
 
-Route::get('/category/{category}', [ //в модели вместо id указали слаг
+Route::get( '/category/{category}', [ //в модели вместо id указали слаг
 	'uses' => 'BlogController@category', //контроллер и его метод
-	'as' => 'category' //шаблон
-]);
+	'as'   => 'category' //шаблон
+] );
 
-Route::get('/author/{author}', [ //в модели вместо id указали слаг
+Route::get( '/author/{author}', [ //в модели вместо id указали слаг
 	'uses' => 'BlogController@author', //контроллер и его метод
-	'as' => 'author' //шаблон
+	'as'   => 'author' //шаблон
+] );
+
+Route::resource( '/backend/blog', 'Backend\BlogController', [
+	'names' => [
+		'create'  => 'backend.blog.create',
+		'index'   => 'backend.blog.index',
+		'edit'    => 'backend.blog.edit',
+		'destroy' => 'backend.blog.destroy',
+	]
 ]);
 
 
+Auth::routes();
 
-
-
+Route::get( '/home', 'Backend\HomeController@index' )->name( 'home' );

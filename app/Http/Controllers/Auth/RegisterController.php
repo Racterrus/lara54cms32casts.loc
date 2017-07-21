@@ -36,6 +36,7 @@ class RegisterController extends Controller
      */
     public function __construct()
     {
+	    abort( 404 ); //закомментируй строку, чтобы вернуть регистрацию!
         $this->middleware('guest');
     }
 
