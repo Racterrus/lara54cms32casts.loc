@@ -170,6 +170,7 @@ return [
 		Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class,
 
 		GrahamCampbell\Markdown\MarkdownServiceProvider::class,
+		Intervention\Image\ImageServiceProvider::class,
 
 		/*
 		 * Package Service Providers...
@@ -241,6 +242,7 @@ return [
 		'Html'         => Collective\Html\HtmlFacade::class,
 
 		'Markdown' => GrahamCampbell\Markdown\Facades\Markdown::class,
+		'Image'    => Intervention\Image\Facades\Image::class
 
 	],
 
