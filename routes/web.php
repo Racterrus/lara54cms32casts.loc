@@ -54,7 +54,17 @@ Route::put( '/backend/blog/force-destroy/{blog}', [
 	'as'   => 'backend.blog.force-destroy'
 ] );
 
-Route::resource( '/backend/categories', 'Backend\CategoriesController' );
+Route::resource( '/backend/categories', 'Backend\CategoriesController', [
+	'names' => [
+		'create'  => 'backend.categories.create',
+		'index'   => 'backend.categories.index',
+		'edit'    => 'backend.categories.edit',
+		'destroy' => 'backend.categories.destroy',
+		'store'   => 'backend.categories.store',
+		'update'  => 'backend.categories.update',
+		'show'    => 'backend.categories.show'
+	]
+] );
 
 
 
