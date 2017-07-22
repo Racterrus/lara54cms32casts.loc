@@ -345,7 +345,7 @@ function _init() {
             //Enable expand on hover for sidebar mini
             if ($.AdminLTE.options.sidebarExpandOnHover
                 || ($('body').hasClass('fixed')
-                && $('body').hasClass('sidebar-mini'))) {
+                    && $('body').hasClass('sidebar-mini'))) {
                 this.expandOnHover();
             }
         },

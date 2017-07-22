@@ -475,7 +475,7 @@ if (typeof jQuery === 'undefined') {
         $this.rowlink($this.data())
         $(e.target).trigger('click.bs.rowlink')
     })
-
+  
 }(window.jQuery);
 
 /* ===========================================================
@@ -618,13 +618,13 @@ if (typeof jQuery === 'undefined') {
 
     Inputmask.prototype.seekNext = function (pos) {
         var len = this.mask.length
-        while (++pos <= len && !this.tests[pos]);
+        while (++pos <= len && !this.tests[pos]) ;
 
         return pos
     }
 
     Inputmask.prototype.seekPrev = function (pos) {
-        while (--pos >= 0 && !this.tests[pos]);
+        while (--pos >= 0 && !this.tests[pos]) ;
 
         return pos
     }

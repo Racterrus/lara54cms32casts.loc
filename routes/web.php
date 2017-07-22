@@ -11,12 +11,12 @@
 |
 */
 
-Route::get('/', [
+Route::get( '/', [
 	'uses' => 'BlogController@index',
-	'as' => 'blog'
-]);
+	'as'   => 'blog'
+] );
 
-Route::get('/blog/{post}', [
+Route::get( '/blog/{post}', [
 	'uses' => 'BlogController@show',
 	'as'   => 'blog.show'
 ] );
@@ -37,9 +37,25 @@ Route::resource( '/backend/blog', 'Backend\BlogController', [
 		'index'   => 'backend.blog.index',
 		'edit'    => 'backend.blog.edit',
 		'destroy' => 'backend.blog.destroy',
-		'store'   => 'backend.blog.store'
+		'store'   => 'backend.blog.store',
+		'update'  => 'backend.blog.update',
+		'show'    => 'backend.blog.show' //избавляет от конфликта с другим роутом BlogController на фронте
 	]
-]);
+] );
+
+
+Route::put( '/backend/blog/restore/{blog}', [
+	'uses' => 'Backend\BlogController@restore',
+	'as'   => 'backend.blog.restore'
+] );
+
+Route::put( '/backend/blog/force-destroy/{blog}', [
+	'uses' => 'Backend\BlogController@forceDestroy',
+	'as'   => 'backend.blog.force-destroy'
+] );
+
+Route::resource( '/backend/categories', 'Backend\CategoriesController' );
+
 
 
 Auth::routes();

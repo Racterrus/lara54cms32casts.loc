@@ -2,9 +2,9 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
+use App\Http\Requests\Request;
 
-class PostRequest extends FormRequest {
+class PostRequest extends Request {
 	/**
 	 * Determine if the user is authorized to make this request.
 	 *
@@ -20,13 +20,24 @@ class PostRequest extends FormRequest {
 	 * @return array
 	 */
 	public function rules() {
-		return [
+		$rules = [
 			'title'        => 'required',
 			'slug'         => 'required|unique:posts',
 			'body'         => 'required',
-			'published_at' => 'date_format:Y-m-d H:i:s|nullable',
+			'published_at' => 'date_format:Y-m-d H:i:s',
 			'category_id'  => 'required',
-			'image'        => 'image'
+			'image'        => 'mimes:jpg,jpeg,bmp,png',
 		];
+
+		switch ( $this->method() ) {
+			//типы запросов
+			case 'PUT':
+			case 'PATCH':
+				//если слаг равен слагу обновляемого поста, то он проходит валидацию
+				$rules['slug'] = 'required|unique:posts,slug,' . $this->route( 'blog' );
+				break;
+		}
+
+		return $rules;
 	}
 }
