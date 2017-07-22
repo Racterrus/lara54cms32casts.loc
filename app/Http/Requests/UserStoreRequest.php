@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use App\Http\Requests\Request;
 
-class CategoryUpdateRequest extends Request {
+class UserStoreRequest extends Request {
 	/**
 	 * Determine if the user is authorized to make this request.
 	 *
@@ -21,8 +21,9 @@ class CategoryUpdateRequest extends Request {
 	 */
 	public function rules() {
 		return [
-			'title' => 'required|max:255|unique:categories,title,' . $this->route( 'category' ),
-			'slug'  => 'required|max:255|unique:categories,slug,' . $this->route( 'category' ),
+			'name'     => 'required',
+			'email'    => 'email|required|unique:users',
+			'password' => 'required|confirmed'
 		];
 	}
 }

@@ -15,9 +15,10 @@ class CategoryDestroyRequest extends Request {
 		return ! ( $this->route( 'category' ) == config( 'cms.default_category_id' ) );
 	}
 
-	public function forbiddenResponse() {
-		return redirect()->back()->with( 'error-message', 'You cannot delete default category!' );
-	}
+	//In Laravel 5.4 forbiddenResponse method is removed.
+//	public function forbiddenResponse() {
+//		return redirect()->back()->with( 'error-message', 'You cannot delete default category!' );
+//	}
 
 	/**
 	 * Get the validation rules that apply to the request.

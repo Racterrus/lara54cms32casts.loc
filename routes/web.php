@@ -66,7 +66,22 @@ Route::resource( '/backend/categories', 'Backend\CategoriesController', [
 	]
 ] );
 
+Route::get( '/backend/users/confirm/{users}', [
+	'uses' => 'Backend\UsersController@confirm',
+	'as'   => 'backend.users.confirm'
+] );
 
+Route::resource( '/backend/users', 'Backend\UsersController', [
+	'names' => [
+		'create'  => 'backend.users.create',
+		'index'   => 'backend.users.index',
+		'edit'    => 'backend.users.edit',
+		'destroy' => 'backend.users.destroy',
+		'store'   => 'backend.users.store',
+		'update'  => 'backend.users.update',
+		'show'    => 'backend.users.show'
+	]
+] );
 
 Auth::routes();
 

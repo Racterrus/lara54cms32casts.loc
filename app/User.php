@@ -49,4 +49,11 @@ class User extends Authenticatable
     public function getRouteKeyName() { //не путать имя функции!!!
 	    return 'slug';
     }
+
+	//Мутатор, хеширует пароль, прежде чем отправить его в БД
+	public function setPasswordAttribute( $value ) {
+		if ( ! empty( $value ) ) {
+			$this->attributes['password'] = bcrypt( $value );
+		}
+	}
 }
