@@ -31,6 +31,11 @@ Route::get( '/author/{author}', [ //в модели вместо id указал
 	'as'   => 'author' //шаблон
 ] );
 
+Route::get( '/tag/{tag}', [ //в модели вместо id указали слаг
+	'uses' => 'BlogController@tag', //контроллер и его метод
+	'as'   => 'tag' //шаблон
+] );
+
 Route::resource( '/backend/blog', 'Backend\BlogController', [
 	'names' => [
 		'create'  => 'backend.blog.create',

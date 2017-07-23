@@ -22,6 +22,12 @@ class Post extends Model
 		return $this->belongsTo(Category::class);
 	}
 
+	//поскольку у нас все по конвенции, по соглашению, то достаточно написать только одну модель, Post тут не обязательно указывать, Laravel сам поймет
+
+	public function tags() {
+		return $this->belongsToMany( Tag::class );
+	}
+
 	public function setPublishedAtAttribute( $value ) {
 		//обрати ванимание на At, а вообще эта конструкция отправляет пустое поле, если value = false
 		$this->attributes['published_at'] = $value ?: null;
@@ -68,6 +74,16 @@ class Post extends Model
 
 	public function getExcerptHtmlAttribute($value) {
 		return $this->excerpt ? Markdown::convertToHtml(e($this->excerpt)) : NULL;
+	}
+
+	public function getTagsHtmlAttribute() {
+		$anchor = [];
+		foreach ( $this->tags as $tag ) {
+			$anchor[] = '<a href="' . route( 'tag', $tag->slug ) . '">' . '#' . $tag->name . '</a>';
+		}
+
+		//разбивем теги запятыми
+		return implode( ", ", $anchor );
 	}
 
 	public function scopePopular( $query ) {
