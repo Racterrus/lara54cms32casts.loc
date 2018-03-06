@@ -11,7 +11,7 @@ use App\Tag;
 
 class BlogController extends Controller
 {
-	protected $limit = 3;
+    protected $limit = 4;
 
     public function index()
     {
@@ -19,9 +19,9 @@ class BlogController extends Controller
 		    //без этих 'author', 'tags',  'category' будет больше запросов к БД
 		             ->latestFirst()
 	                 ->published()
-	                 ->simplePaginate( $this->limit );
+            ->paginate($this->limit);
 
-	    return view( "blog.index", compact( 'posts' ) );
+        return view("front.blog.index", compact('posts'));
     }
 
 	public function category( Category $category ) {
@@ -31,9 +31,9 @@ class BlogController extends Controller
 		                  ->with( 'author', 'tags', 'category' )
 		                  ->latestFirst()
 		                  ->published()
-		                  ->simplePaginate( $this->limit );
+            ->paginate($this->limit);
 
-		return view( "blog.index", compact( 'posts', 'categoryName' ) );
+        return view("front.blog.index", compact('posts', 'categoryName'));
 	}
 
 	public function tag( Tag $tag ) {
@@ -43,9 +43,9 @@ class BlogController extends Controller
 		             ->with( 'author', 'category' )
 		             ->latestFirst()
 		             ->published()
-		             ->simplePaginate( $this->limit );
+            ->paginate($this->limit);
 
-		return view( "blog.index", compact( 'posts', 'tagName' ) );
+        return view("front.blog.index", compact('posts', 'tagName'));
 	}
 
 	public function author( User $author ) {
@@ -55,15 +55,17 @@ class BlogController extends Controller
 		                ->with( 'category', 'tags', 'author' )
 		                ->latestFirst()
 		                ->published()
-		                ->simplePaginate( $this->limit );
+            ->paginate($this->limit);
 
-		return view( "blog.index", compact( 'posts', 'authorName' ) );
+        return view("front.blog.index", compact('posts', 'authorName'));
 	}
 
 	public function show( Post $post )
     {
 	    $post->increment( 'view_count' );
 
-	    return view( "blog.show", compact( 'post' ) );
+        $postComments = $post->comments()->simplePaginate(3);
+
+        return view("front.blog.show", compact('post', 'postComments'));
     }
 }

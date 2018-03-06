@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Post;
 use Intervention\Image\Facades\Image;
+use Illuminate\Support\Facades\Auth;
 
 class BlogController extends BackendController {
 	protected $limit = 5;
@@ -14,7 +15,6 @@ class BlogController extends BackendController {
 	public function __construct() {
 		parent::__construct();
 		$this->uploadPath = public_path( config( 'cms.image.directory' ) );
-
 	}
 
 	/**
@@ -25,28 +25,54 @@ class BlogController extends BackendController {
 	public function index( Request $request ) {
 		$onlyTrashed = false;
 
-		if ( ( $status = $request->get( 'status' ) ) && $status == 'trash' ) {
-			$posts       = Post::onlyTrashed()->with( 'category', 'author' )->latest()->paginate( $this->limit );
-			$postCount   = Post::onlyTrashed()->count();
-			$onlyTrashed = true;
-		} elseif ( $status == 'published' ) {
-			$posts     = Post::published()->with( 'category', 'author' )->latest()->paginate( $this->limit );
-			$postCount = Post::published()->count();
-		} elseif ( $status == 'scheduled' ) {
-			$posts     = Post::scheduled()->with( 'category', 'author' )->latest()->paginate( $this->limit );
-			$postCount = Post::scheduled()->count();
-		} elseif ( $status == 'draft' ) {
-			$posts     = Post::draft()->with( 'category', 'author' )->latest()->paginate( $this->limit );
-			$postCount = Post::draft()->count();
-		} else {
-			$posts     = Post::with( 'category', 'author' )->latest()->paginate( $this->limit );
-			$postCount = Post::count();
-		}
+        if (Auth::user()->can('indexAllPosts', Post::class)) { //проверка права, только администратор может смотреть все посты
+            if (($status = $request->get('status')) && $status == 'trash') {
+                $posts = Post::onlyTrashed()->with('category', 'author')->latest()->paginate($this->limit);
+                $postCount = Post::onlyTrashed()->count();
+                $onlyTrashed = true;
+            } elseif ($status == 'published') {
+                $posts = Post::published()->with('category', 'author')->latest()->paginate($this->limit);
+                $postCount = Post::published()->count();
+            } elseif ($status == 'scheduled') {
+                $posts = Post::scheduled()->with('category', 'author')->latest()->paginate($this->limit);
+                $postCount = Post::scheduled()->count();
+            } elseif ($status == 'draft') {
+                $posts = Post::draft()->with('category', 'author')->latest()->paginate($this->limit);
+                $postCount = Post::draft()->count();
+            } else {
+                $posts = Post::with('category', 'author')->latest()->paginate($this->limit);
+                $postCount = Post::count();
+            }
 
-		$statusList = $this->statusList();
+            $statusList = $this->statusList();
 
-		return view( "backend.blog.index", compact( 'posts', 'postCount', 'onlyTrashed', 'statusList' ) );
-	}
+            return view("backend.blog.index", compact('posts', 'postCount', 'onlyTrashed', 'statusList'));
+
+        } else {//только посты пользователя
+            if (($status = $request->get('status')) && $status == 'trash') {
+                $posts = Post::onlyTrashed()->with('category', 'author')->whereAuthorId(Auth::id())->latest()->paginate($this->limit);
+                $postCount = Post::onlyTrashed()->whereAuthorId(Auth::id())->count();
+                $onlyTrashed = true;
+            } elseif ($status == 'published') {
+                $posts = Post::published()->whereAuthorId(Auth::id())->with('category', 'author')->latest()->paginate($this->limit);
+                $postCount = Post::published()->whereAuthorId(Auth::id())->count();
+            } elseif ($status == 'scheduled') {
+                $posts = Post::scheduled()->whereAuthorId(Auth::id())->with('category', 'author')->latest()->paginate($this->limit);
+                $postCount = Post::scheduled()->whereAuthorId(Auth::id())->count();
+            } elseif ($status == 'draft') {
+                $posts = Post::draft()->with('category', 'author')->whereAuthorId(Auth::id())->latest()->paginate($this->limit);
+                $postCount = Post::draft()->whereAuthorId(Auth::id())->count();
+            } else {
+                $posts = Post::with('category', 'author')->whereAuthorId(Auth::id())->paginate($this->limit);
+                $postCount = Post::whereAuthorId(Auth::id())->count();
+            }
+
+            $statusList = $this->statusList();
+
+            return view("backend.blog.index", compact('posts', 'postCount', 'onlyTrashed', 'statusList'));
+        }
+
+    }
 
 	private function statusList() {
 		return [
@@ -134,7 +160,10 @@ class BlogController extends BackendController {
 	 * @return \Illuminate\Http\Response
 	 */
 	public function edit( $id ) {
+
 		$post = Post::findOrFail( $id );
+
+        $this->authorize('editPost', $post); //проверк права
 
 		return view( "backend.blog.edit", compact( 'post' ) );
 	}
@@ -148,7 +177,8 @@ class BlogController extends BackendController {
 	 * @return \Illuminate\Http\Response
 	 */
 	public function update( Requests\PostRequest $request, $id ) {
-		$post     = Post::findOrFail( $id );
+
+        $post = Post::findOrFail($id);
 		$oldImage = $post->image;
 		$data     = $this->handleRequest( $request );
 		$post->update( $data );
@@ -159,6 +189,23 @@ class BlogController extends BackendController {
 
 		return redirect( '/backend/blog' )->with( 'message', 'Your post was updated successfully!' );
 	}
+
+    private function removeImage($image)
+    {
+        if (!empty($image)) {
+            $imagePath = $this->uploadPath . '/' . $image;
+            $ext = substr(strrchr($image, '.'), 1);
+            $thumbnail = str_replace(".{$ext}", "_thumb.{$ext}", $image);
+            $thumbnailPath = $this->uploadPath . '/' . $thumbnail;
+
+            if (file_exists($imagePath)) {
+                unlink($imagePath);
+            }
+            if (file_exists($thumbnailPath)) {
+                unlink($thumbnailPath);
+            }
+        }
+    }
 
 	/**
 	 * Remove the specified resource from storage.
@@ -188,19 +235,5 @@ class BlogController extends BackendController {
 		$post->restore();
 
 		return redirect()->back()->with( 'message', 'You post has been moved from the Trash' );
-	}
-
-	private function removeImage( $image ) {
-		if ( ! empty( $image ) ) {
-			$imagePath     = $this->uploadPath . '/' . $image;
-			$ext           = substr( strrchr( $image, '.' ), 1 );
-			$thumbnail     = str_replace( ".{$ext}", "_thumb.{$ext}", $image );
-			$thumbnailPath = $this->uploadPath . '/' . $thumbnail;
-
-			if ( file_exists( $imagePath ) )
-				unlink( $imagePath );
-			if ( file_exists( $thumbnailPath ) )
-				unlink( $thumbnailPath );
-		}
 	}
 }

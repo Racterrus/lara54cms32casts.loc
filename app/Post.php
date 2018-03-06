@@ -5,7 +5,6 @@ namespace App;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
-use GrahamCampbell\Markdown\Facades\Markdown;
 
 class Post extends Model
 {
@@ -64,16 +63,21 @@ class Post extends Model
 		return is_null($this->published_at) ? ''  : $this->published_at->diffForHumans();
 	}
 
+    public function getDateAttribute($value)
+    {
+        return is_null($this->published_at) ? '' : $this->published_at->diffForHumans();
+    }
+
 	public function scopeLatestFirst($query) {
 		return $query->orderBy('created_at', 'desc');
 	}
 
 	public function getBodyHtmlAttribute($value) {
-		return $this->body ? Markdown::convertToHtml(e($this->body)) : NULL;
+        return $this->body ? $this->body : NULL;
 	}
 
 	public function getExcerptHtmlAttribute($value) {
-		return $this->excerpt ? Markdown::convertToHtml(e($this->excerpt)) : NULL;
+        return $this->excerpt ? $this->excerpt : NULL;
 	}
 
 	public function getTagsHtmlAttribute() {
@@ -120,4 +124,19 @@ class Post extends Model
 	public function scopeDraft( $query ) {
 		return $query->whereNull( "published_at" );
 	}
+
+    public function comments()
+    {
+        return $this->hasMany(Comment::class);
+    }
+
+    public function commentsNumber()
+    {
+        return $commentsNumber = $this->comments->count();
+    }
+
+    public function createComment(array $data)
+    {
+        $this->comments()->create($data);
+    }
 }
